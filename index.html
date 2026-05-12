@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <!-- iOS PWA メタタグ -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="DASH">
+  <title>SINCERITA Dashboard</title>
+  <!-- apple-touch-icon(同一オリジン) -->
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      background: #F8F5EE;
+      color: #47484D;
+      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Hiragino Sans", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      letter-spacing: 0.08em;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .brand {
+      font-size: 48px;
+      font-weight: 700;
+      margin-bottom: 24px;
+    }
+    .enter-btn {
+      padding: 14px 36px;
+      background: #47484D;
+      color: #F8F5EE;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .enter-btn:active {
+      opacity: 0.7;
+    }
+    .hint {
+      margin-top: 16px;
+      font-size: 11px;
+      color: #999;
+      letter-spacing: 0.05em;
+    }
+  </style>
+</head>
+<body>
+  <div class="brand">DASH</div>
+  <button class="enter-btn" id="enterBtn">ダッシュボードを開く</button>
+  <div class="hint" id="hint">ホーム画面に追加後は自動で開きます</div>
+  <script>
+    (function() {
+      'use strict';
+      // ↓↓↓ ここをダッシュボードのGAS Web App URLに書き換えてください ↓↓↓
+      var GAS_URL = 'https://script.google.com/a/macros/sincerita.jp/s/【ダッシュボードのデプロイID】/exec';
+      // tokenを取得
+      var params = new URLSearchParams(window.location.search);
+      var token = params.get('token') || '';
+      var target = GAS_URL + (token ? '?token=' + encodeURIComponent(token) : '');
+      // ホーム画面から起動されたかどうかを判定
+      // navigator.standalone === true なら、ホーム画面アイコンから起動された(=即リダイレクト)
+      var isStandalone = window.navigator.standalone === true ||
+                         window.matchMedia('(display-mode: standalone)').matches;
+      if (isStandalone) {
+        // ホーム画面から起動された場合 → 即座にリダイレクト
+        document.getElementById('hint').textContent = '起動中...';
+        setTimeout(function() {
+          window.location.replace(target);
+        }, 100);
+      } else {
+        // ブラウザで開かれた場合 → ボタンタップを待つ(iOSにアイコン取得時間を与える)
+        document.getElementById('enterBtn').addEventListener('click', function() {
+          window.location.replace(target);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
